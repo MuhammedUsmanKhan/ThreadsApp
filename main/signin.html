@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./output.css">
+</head>
+
+<body class="h-screen bg-cover bg-bottom bg-no-repeat bg-SIn">
+    <div class=" flex flex-col justify-center  h-full">
+        <div class=" flex container justify-center h-3/4 mx-auto">
+            <div class="flex flex-col order-2 w-11/12 relative  sm:w-2/4 ">
+                <div class="absolute  -inset-2 bg-[#040a1a] rounded-r-xl blur-sm"></div>
+                <div
+                    class="flex flex-col space-y-5 rounded-r-xl w-full h-full bg-white justify-center items-center sm:space-y-3 relative">
+                    <div class="sm:flex flex-col hidden text-center justify-center items-center">
+                        <!-- <img class="mb-3 bg-center fill-yellow-400 w-20 h-24" src="./img/vecteezy_iq-logo-monogram-emblem-style-with-crown-shape-design-template_ (1).jpg"></img> -->
+                        <span class="text-3xl  font-medium text-[#03132b]  mb-3 ">Threads Login Form</span>
+                    </div>
+                    <div class="flex flex-col w-3/4  items-center  space-y-4">
+                        <div class=" sm:w-4/5 w-full space-y-2">
+                            <label for="" class="text-base font-bold">Email :</label>
+
+                            <div class="relative ">
+                                <div class="absolute -inset-1 bg-[#03132b] rounded-full blur-sm"></div>
+                                <input type="email" placeholder="Email"
+                                    class="relative outline-none p-2 pl-12 rounded-full w-full" name="" id="Semail">
+                                <i class="fa-solid fa-envelope-open fa-beat-fade absolute left-4 top-3"
+                                    style="color: #03132b;"></i>
+                            </div>
+                        </div>
+                        <div class=" sm:w-4/5 w-full space-y-2">
+                            <label for="" class="text-base font-bold">Password :</label>
+                            <div class="relative">
+                                <div class="absolute -inset-1 bg-[#03132b] rounded-full blur-sm"></div>
+                                <input type="password" placeholder="Password"
+                                    class="p-2 pl-12 outline-none relative rounded-full w-full" name="" id="Spass">
+                                <i class="fa-solid fa-unlock-keyhole absolute left-4 top-3 fa-beat-fade"
+                                    style="color: #03132b;"></i>
+                                <!-- <i class="fa-solid fa-eye-slash absolute -right-8  top-3 fa-beat-fade" style="color: #63bffa;"></i> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-[#26589f] flex justify-around w-full  ">
+                        <div>
+                            <input type="checkbox" name="" id="">
+                            <label for="">Remember me</label>
+                        </div>
+                        <div><a href="" class="underline underline-offset-2">Reset Password!</a></div>
+                    </div>
+                    <div class="flex flex-col items-center sm:w-3/5 w-4/5 space-y-3 ">
+                        <button
+                            class="bg-gradient-to-r text-center text-white font-semibold from-cyan-400 rounded-full w-full to-[#26589f]  p-2"
+                            id="but">
+                            Login
+                        </button>
+                        <span class="text-[#26589f] flex w-full justify-center">Already have an account?<b class="text-cyan-400">Sign in</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-col hidden sm:flex order-1 relative w-2/5">
+                <div class="absolute  -inset-2 right-0 bg-[#040a1a] rounded-l-xl blur-sm"></div>
+                <div
+                    class="relative h-full flex flex-col justify-center items-center rounded-l-xl bg-gradient-to-br from-[#03132b] from-50% to-[#083763] to-50% ">
+                    <div>
+                        <h1 class="text-2xl text-white font-semibold text-center">Glad To See You!</h1>
+                        <h1 class="text-2xl text-white font-semibold text-center">Welcome To The Quiz App</h1>
+                        <p class=" text-white font-medium text-center">Sign Up to Our Quiz Application in order to
+                            attempt
+                            the Quiz <br> Enter Your Name Email Password</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./AppFiles/signin.js"></script>
+    <script src="https://kit.fontawesome.com/5a0b948d4f.js" crossorigin="anonymous"></script>
+    <!-- <script type="module" src="./AppFiles/signup.js"></script> -->
+</body>
+
+</html>

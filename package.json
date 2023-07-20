@@ -1,0 +1,16 @@
+{
+  "name": "threadapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx tailwindcss -i input.css -o ./main/output.css --watch",
+    "prod" : "npx tailwindcss -i input.css -o ./main/output.css --minify"
+  },
+  "author": "Mohammad Usman Khan",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.3.3"
+  }
+}

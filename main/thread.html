@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thread App UI</title>
+  <link rel="stylesheet" href="./output.css">
+  <style>
+    .modal {
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .modal-container {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .modal-open {
+      opacity: 1;
+    }
+
+    .modal-container-open {
+      transform: translate(0, 0);
+    }
+
+    /* .card {
+        height: 49%;
+        width: 32.5%;
+    } */
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <div class="flex  justify-between items-start ">
+      <div class=" ">
+        <h1 class="text-3xl font-bold mb-4">Threads</h1>
+      </div>
+      <div class="flex  items-start justify-between  w-6/12  ">
+        <div class="relative ml-3 order-2">
+          <div>
+            <button type="button"
+              class="flex rounded-full  bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+              id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+              <span class="sr-only">Open user menu</span>
+              <img class="h-11 w-11 rounded-full"
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt="">
+            </button>
+          </div>
+          <div
+            class="absolute hidden right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            id="userMenuDropdown" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+            <!-- Active: "bg-gray-100", Not Active: "" -->
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+              id="signOutMenu">Sign out</a>
+          </div>
+        </div>
+        <div class=" order-1">
+          <button id="openModal"
+            class="text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none">Create
+            Post</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <ul id="threadList" class="grid gap-4">
+        <!-- Thread item -->
+        <li class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between">
+          <div>
+            <h2 class="text-2xl font-semibold mb-2">Thread Title 1</h2>
+            <p class="text-gray-600 text-sm">By <span class="text-indigo-600">John Doe</span></p>
+          </div>
+          <div class="flex justify-between items-center mt-4">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-gray-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M19 21v-1a7 7 0 00-7-7H8a7 7 0 00-7 7v1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v2m0 8v.01" />
+              </svg>
+              <span class="text-sm text-gray-600">7 replies</span>
+            </div>
+            <button
+              class="text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none">
+              View
+            </button>
+          </div>
+        </li>
+
+        <!-- Thread item -->
+        <li class="bg-white rounded-lg shadow-md p-6 flex flex-col justify-between">
+          <div>
+            <h2 class="text-2xl font-semibold mb-2">Thread Title 2</h2>
+            <p class="text-gray-600 text-sm">By <span class="text-indigo-600">Jane Smith</span></p>
+          </div>
+          <div class="flex justify-between items-center mt-4">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-gray-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M19 21v-1a7 7 0 00-7-7H8a7 7 0 00-7 7v1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v2m0 8v.01" />
+              </svg>
+              <span class="text-sm text-gray-600">12 replies</span>
+            </div>
+            <button
+              class="text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none">
+              View
+            </button>
+          </div>
+        </li>
+        <!-- Add more thread items here -->
+      </ul>
+    </div>
+    <!-- Thread list -->
+    <div id="createPollModal"
+      class="modal createPollModel fixed  w-full border-2 border-yellow-600 h-full top-0 left-0 flex items-center justify-center opacity-0 hidden">
+      <div class="createPoll-modal-overlay  absolute w-full h-full bg-gray-900 opacity-50"></div>
+      <div
+        class="createPoll-modal-container modal-container bg-[#ffcc01] w-11/12 md:max-w-md mx-auto h-5/6 rounded-xl shadow-lg z-50 overflow-y-auto transform -translate-y-32">
+        <div class="createPoll-modal-content space-y-4 text-left">
+          <div class="flex justify-between py-3 border-b-2 border-white border-solid items-center pb-3">
+            <p class="text-2xl font-bold text-white px-6">Post</p>
+            <div class="createPoll-modal-close cursor-pointer px-6 z-50">
+              <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                viewBox="0 0 18 18">
+                <path
+                  d="M18 1.636L16.364 0 9 7.364 1.636 0 0 1.636 7.364 9 0 16.364 1.636 18 9 10.636 16.364 18 18 16.364 10.636 9 18 1.636z" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex px-6">
+            <div class="flex flex-col space-y-2  w-full">
+              <div class="relative">
+                <input type="text" name="" id="threadTitle" required
+                  class="w-full p-2  text-white transition-colors peer bg-[#ffcc01] outline-none border-2 duration-500"
+                  autocomplete="off">
+                <label for="pollTitle"
+                  class=" absolute peer-focus:text-xs bottom-[0.6rem] left-3 text-white font-semibold peer-focus:bg-[#ffcc01] 
+                          peer-focus:transform peer-focus:-translate-y-6 peer-focus:pl-1 peer-focus:pr-1 duration-500  transition-all ">Thread
+                  Title</label>
+              </div>
+              <div class=" relative h-full ">
+                <textarea id="textArea"
+                  class="shadow appearance-none peer duration-500 bg-[#ffcc01] border-2 h-full resize-none rounded w-full p-2 text-white leading-tight focus:outline-none focus:shadow-outline"
+                  rows="15"></textarea>
+                <label for="pollOption1"
+                  class=" absolute peer-focus:text-xs top-1 left-3 text-white font-semibold peer-focus:bg-[#ffcc01] 
+                          peer-focus:transform peer-focus:-translate-y-3 peer-focus:pl-1 peer-focus:pr-1 duration-500  transition-all ">Enter
+                  text here !</label>
+              </div>
+            </div>
+          </div>
+          <div class="flex pt-1">
+            <button
+              class="modal-close px-4 w-full bg-[#ffcc01] border-t-2 border-solid hover:border-[#ffcc01] p-[0.90rem] font-semibold rounded-b-lg text-white hover:bg-white hover:text-[#ffcc01]"
+              id="pollCreatedBut">Submit</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div id="myViewModal"
+            class="modal viewPollDataModal fixed  w-full border-2 border-yellow-600 h-full top-0 left-0 flex items-center justify-center opacity-0 hidden">
+            <div class="view-Modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+            <div
+                class="view-Modal-container modal-container bg-[#ffcc01] w-11/12 md:max-w-md mx-auto h-5/6 rounded-xl shadow-lg z-50 overflow-y-auto transform -translate-y-32">
+                <div class="modal-content  space-y-4 text-left">
+                    <div class="flex justify-between py-4 border-b-2 border-white border-solid items-center pb-3">
+                        <p class="text-2xl font-bold text-white px-6">Create Poll</p>
+                        <div class="view-Modal-close cursor-pointer px-6 z-50">
+                            <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18"
+                                height="18" viewBox="0 0 18 18">
+                                <path
+                                    d="M18 1.636L16.364 0 9 7.364 1.636 0 0 1.636 7.364 9 0 16.364 1.636 18 9 10.636 16.364 18 18 16.364 10.636 9 18 1.636z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex flex-col py-2 space-y-6 px-6">
+                        <div class="text-white font-medium">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque luctus finibus erat, id
+                                auctor
+                                quam
+                                iaculis ac. Integer a tortor non orci sagittis efficitur sed et diam.</p>
+                        </div>
+                        <div class="flex flex-col space-y-4 w-full">
+
+                            <div
+                                class="flex items-center pollOption1 w-full p-2 text-white bg-[#ffcc01] outline-none border-2 space-x-2">
+                                <input type="radio" name="fk" id="">
+                                <label for="">Random Option 1</label>
+                            </div>
+                            <div
+                                class="pollOption2 flex items-center space-x-2 w-full p-2 text-white bg-[#ffcc01] outline-none border-2">
+                                <input type="radio" name="fk" id="">
+                                <label for="">Random Option 2</label>
+                            </div>
+                            <div
+                                class="pollOption3 flex items-center space-x-2 w-full p-2 text-white bg-[#ffcc01] outline-none border-2">
+                                <input type="radio" name="fk" id="">
+                                <label for="">Random Option 3</label>
+                            </div>
+                            <div
+                                class="pollOption4 flex items-center space-x-2 w-full p-2 text-white bg-[#ffcc01] outline-none border-2">
+                                <input type="radio" name="fk" id="">
+                                <label for="">Random Option 4</label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="flex pt-2 ">
+                        <button
+                            class="modal-close px-4 w-full bg-[#ffcc01] border-t-2 border-solid hover:border-[#ffcc01] p-[1.25rem] font-semibold rounded-b-lg text-white hover:bg-white hover:text-[#ffcc01]"
+                            id="pollCreatedBut">Add a Vote</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+  </div>
+  <script type="module" src="./AppFiles/thread.js"></script>
+</body>
+
+</html>
