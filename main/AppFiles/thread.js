@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword , createUserWithEmailAndPassword, onAuthStateChanged , signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, onSnapshot , doc ,getDoc , deleteDoc} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClpo8swwA_PSFRGYDqOgWkVRwPjloDt5c",
@@ -49,13 +49,22 @@ let textArea = document.getElementById(`textArea`)
 let threadCreateBut = document.getElementById(`pollCreatedBut`)
 threadCreateBut.addEventListener(`click`, async () => {
   // Add a new document in collection "cities"
-  const userName = localStorage.getItem(`userName`)
+  const userData = JSON.parse(localStorage.getItem(`userData`))
+  console.log(userData)
   const user = auth.currentUser;
+  let userName;
+  console.log(user.email)
+  for (let i = 0; i < userData.length; i++) {
+    if (user.email == userData[i].emailID) {
+      console.log(userData[i].Name)
+       userName = userData[i].Name
+    }
+  }
   console.log(user)
   try {
     if (threadTitleInp.value.trim().length != 0 && textArea.value.trim().length != 0) {
       const docRef = await addDoc(collection(db, "threads"), {
-        pollTitle: threadTitleInp.value,
+        threadTitle: threadTitleInp.value,
         threadContent: textArea.value,
         userName: userName,
         userID: user.uid,
@@ -63,7 +72,7 @@ threadCreateBut.addEventListener(`click`, async () => {
         timestamp: serverTimestamp(),
       });
       console.log("Document written with ID: ", docRef.id);
-      
+
       threadTitleInp.value = ""
       textArea.value = ""
       modal.classList.remove('modal-open');
@@ -84,27 +93,29 @@ threadCreateBut.addEventListener(`click`, async () => {
 
 let userMenuButton = document.getElementById(`user-menu-button`)
 let userMenuDropDown = document.getElementById(`userMenuDropdown`)
-userMenuButton.addEventListener(`click`,(event)=>{
-      event.preventDefault()
-      userMenuDropDown.classList.remove(`hidden`)
+userMenuButton.addEventListener(`click`, (event) => {
+  event.preventDefault()
+  userMenuDropDown.classList.remove(`hidden`)
 })
 let signOutMenu = document.getElementById(`signOutMenu`)
-signOutMenu.addEventListener(`click`,()=>{
-signOut(auth).then(() => {
-  alert('succesfully signed out')
-  localStorage.removeItem(`userName`)
-  location.href = './signin.html'
-}).catch((error) => {
-  // An error happened.
-});
+signOutMenu.addEventListener(`click`, () => {
+  signOut(auth).then(() => {
+    alert('succesfully signed out')
+    location.href = './signin.html'
+  }).catch((error) => {
+    // An error happened.
+  });
 })
 let displayThreads = () => {
   const q = query(collection(db, "threads"));
-const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  const threadList = document.getElementById("threadList");
-  threadList.innerHTML=" "
-  querySnapshot.forEach((doc) => {
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const threadList = document.getElementById("threadList");
+    threadList.innerHTML = " "
+    querySnapshot.forEach((doc) => {
       console.log(doc.data())
+      const docID = document.createElement(`span`)
+      docID.setAttribute(`class`, `hidden`)
+      docID.textContent = doc.id
       // Create the list item element
       const listItem = document.createElement("li");
       listItem.setAttribute("class", "bg-white rounded-lg shadow-md p-6 flex flex-col justify-between");
@@ -115,7 +126,7 @@ const unsubscribe = onSnapshot(q, (querySnapshot) => {
       // Create the thread title heading element and add content
       const threadTitle = document.createElement("h2");
       threadTitle.setAttribute("class", "text-2xl font-semibold mb-2");
-      threadTitle.textContent = `${doc.data().pollTitle}`;
+      threadTitle.textContent = `${doc.data().threadTitle}`;
 
       // Create the paragraph element for the author and add content
       const authorParagraph = document.createElement("p");
@@ -154,13 +165,14 @@ const unsubscribe = onSnapshot(q, (querySnapshot) => {
       // Create the button element
       const viewButton = document.createElement("button");
       viewButton.setAttribute("class", "text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none");
-      viewButton.setAttribute(`id`,`myViewModal`)
-      viewButton.addEventListener(`click`,openViewModal)
+      viewButton.setAttribute(`id`, `myViewModal`)
+      viewButton.addEventListener(`click`, openViewModal)
+      viewButton.addEventListener(`click`, displayUserThreadInfo)
       viewButton.textContent = "View";
 
       // Append the inner div and button to the second inner div
       secondDiv.appendChild(innerDiv);
-      secondDiv.appendChild(viewButton);
+      secondDiv.append(viewButton, docID);
 
       // Append both inner divs to the list item
       listItem.appendChild(firstDiv);
@@ -168,11 +180,11 @@ const unsubscribe = onSnapshot(q, (querySnapshot) => {
 
       // Append the list item to the thread list
       threadList.appendChild(listItem);
+    });
+    //console.log("Current cities in CA: ", cities.join(", "));
   });
-  //console.log("Current cities in CA: ", cities.join(", "));
-});
 }
-document.addEventListener("DOMContentLoaded",displayThreads)
+document.addEventListener("DOMContentLoaded", displayThreads)
 //=======================View-Modal==========================//
 const viewModal = document.getElementById('myViewModal');
 const viewCloseModal = viewModal.getElementsByClassName('view-Modal-close')[0];
@@ -197,6 +209,26 @@ viewModalOverlay.addEventListener('click', () => {
   viewModal.classList.remove('modal-open');
   viewModalContainer.classList.remove('modal-container-open');
   setTimeout(() => {
-   viewModal.classList.add('hidden');
+    viewModal.classList.add('hidden');
   }, 300);
 });
+let displayUserThreadInfo = async (event) => {
+  event.preventDefault()
+  console.log(event.target.nextElementSibling)
+  const docID = event.target.nextElementSibling.textContent;
+  const docRef = doc(db, "threads", docID);
+  const docSnap = await getDoc(docRef);
+  const threadTitle = document.getElementById(`Title`)
+  const threadContent = document.getElementById(`threadContent`)
+  //threadContent.setAttribute(`class`,``)  
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+    console.log(docSnap.data().threadTitle)
+    threadTitle.textContent = docSnap.data().threadTitle
+    threadContent.textContent = docSnap.data().threadContent
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+
+}

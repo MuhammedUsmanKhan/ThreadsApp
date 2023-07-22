@@ -20,18 +20,34 @@ const auth = getAuth(app);
 
 
 let but = document.querySelector(`#but`)
-
 but.addEventListener(`click`, () => {
   let userName = document.querySelector(`#userName`).value
   let email = document.querySelector(`#uemail`).value
-  let password = document.querySelector(`#upass`).value
+  let password = document.querySelector(`#upass`).value 
+
+  let obj = {
+    'Name' : userName,
+    'emailID': email
+  }
+  let userData = []
+  
+  if(!localStorage.getItem('userData')){
+      userData.push(obj)
+      localStorage.setItem(`userData`,JSON.stringify(userData))
+     }else{
+      let userDataPar = localStorage.getItem(`userData`,userData)
+      let parseduserData = JSON.parse(userDataPar)
+      parseduserData.push(obj)
+      localStorage.setItem(`userData`,JSON.stringify(parseduserData))
+     }
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in 
-      localStorage.setItem(`userName`,userName)
+  //    users++
+      
       const user = userCredential.user;
       alert("hogaya")
-      location.href = `./profile.html`
+     // location.href = `./profile.html`
       // ...
     })
     .catch((error) => {
