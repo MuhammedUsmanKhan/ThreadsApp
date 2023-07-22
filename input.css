@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media screen and (min-width: 767px) {
+    .ThreadDataCont{
+        height: 71%;
+  } 
+  }
+  @media screen and (min-width: 1339px) {
+    .ThreadDataCont{
+        height: 79.6%;
+  } 
+  }
+
+  /* For screens larger than 768px, use max-width: 768px */
+@media (min-width: 768px) {
+    .view-Modal-container {
+      max-width: 768px;
+    }
+  }
+  
+  /* For screens larger than 1024px, use max-width: 1024px */
+  @media (min-width: 1024px) {
+    .view-Modal-container {
+      max-width: 1024px;
+    }
+  }

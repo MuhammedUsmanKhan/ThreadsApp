@@ -154,6 +154,8 @@ const unsubscribe = onSnapshot(q, (querySnapshot) => {
       // Create the button element
       const viewButton = document.createElement("button");
       viewButton.setAttribute("class", "text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none");
+      viewButton.setAttribute(`id`,`myViewModal`)
+      viewButton.addEventListener(`click`,openViewModal)
       viewButton.textContent = "View";
 
       // Append the inner div and button to the second inner div
