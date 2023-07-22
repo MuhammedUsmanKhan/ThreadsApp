@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc , updateDoc , orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClpo8swwA_PSFRGYDqOgWkVRwPjloDt5c",
@@ -107,7 +107,7 @@ signOutMenu.addEventListener(`click`, () => {
   });
 })
 let displayThreads = () => {
-  const q = query(collection(db, "threads"));
+  const q = query(collection(db, "threads"),orderBy("timestamp", "desc"));
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const threadList = document.getElementById("threadList");
     threadList.innerHTML = " "
@@ -115,6 +115,7 @@ let displayThreads = () => {
       console.log(doc.data())
       const docID = document.createElement(`span`)
       docID.setAttribute(`class`, `hidden`)
+      //docID.setAttribute(`id`,`id`)
       docID.textContent = doc.id
       // Create the list item element
       const listItem = document.createElement("li");
@@ -230,5 +231,21 @@ let displayUserThreadInfo = async (event) => {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
   }
-
+ // return docID
 }
+let commentBut = document.getElementById(`postComment`)
+let addComment = async (e) =>{
+  e.preventDefault();
+  //e.target
+  let user = auth.currentUser
+  console.log(user)
+  //let docId = document.getElementById('id')
+  let threadComment = document.getElementById('threadComment')
+  console.log(docId.textContent)
+  const washingtonRef = doc(db, "threads", );
+// Set the "capital" field of the city 'DC'
+await updateDoc(washingtonRef, {
+  [user.uid]: threadComment.value
+});
+}
+commentBut.addEventListener(`click`, addComment)
