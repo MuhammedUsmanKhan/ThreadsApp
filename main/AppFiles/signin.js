@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword , onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-
+import { getFirestore, collection, getDocs,addDoc, orderBy, serverTimestamp, query, onSnapshot, where, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
   // TODO: Add SDKs for Firebase products that you want to use
   // https://firebase.google.com/docs/web/setup#available-libraries
@@ -18,11 +18,35 @@ import { getAuth, signInWithEmailAndPassword , onAuthStateChanged } from "https:
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-
+const db = getFirestore(app)
 let but = document.querySelector(`#but`)
-but.addEventListener(`click`, () => {
-    let email = document.querySelector(`#Semail`).value
+but.addEventListener(`click`, async () => {
+    
+  if(!localStorage.getItem(`userData`)){
+
+    let userData = []
+    const q = query(collection(db, "userDetails"));
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+   
+      let obj = {
+            'Name' : doc.data().userName,
+            'emailID': doc.data().userEmail
+          }
+          
+    //      if(!localStorage.getItem('userData')){
+              userData.push(obj)
+      
+    });
+    localStorage.setItem(`userData`,JSON.stringify(userData))
+  }
+  
+  
+  let email = document.querySelector(`#Semail`).value
     let password = document.querySelector(`#Spass`).value
+    
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed in 
@@ -50,3 +74,19 @@ const CheckingUser = (user) => {
   };
   
   onAuthStateChanged(auth, CheckingUser)
+
+// let obj = {
+//     'Name' : userName,
+//     'emailID': email
+//   }
+//   let userData = []
+  
+//   if(!localStorage.getItem('userData')){
+//       userData.push(obj)
+//       localStorage.setItem(`userData`,JSON.stringify(userData))
+//      }else{
+//       let userDataPar = localStorage.getItem(`userData`,userData)
+//       let parseduserData = JSON.parse(userDataPar)
+//       parseduserData.push(obj)
+//       localStorage.setItem(`userData`,JSON.stringify(parseduserData))
+//      }

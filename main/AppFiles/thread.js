@@ -221,12 +221,14 @@ let displayUserThreadInfo = async (event) => {
   const docSnap = await getDoc(docRef);
   const threadTitle = document.getElementById(`Title`)
   const threadContent = document.getElementById(`threadContent`)
+  const docIDCont = document.getElementById(`docIDCont`)
   //threadContent.setAttribute(`class`,``)  
   if (docSnap.exists()) {
     console.log("Document data:", docSnap.data());
     console.log(docSnap.data().threadTitle)
     threadTitle.textContent = docSnap.data().threadTitle
     threadContent.textContent = docSnap.data().threadContent
+    docIDCont.textContent = docID
   } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
@@ -236,16 +238,42 @@ let displayUserThreadInfo = async (event) => {
 let commentBut = document.getElementById(`postComment`)
 let addComment = async (e) =>{
   e.preventDefault();
+  const docIDCont = document.getElementById(`docIDCont`)
+
   //e.target
   let user = auth.currentUser
-  console.log(user)
+  // console.log(user)
   //let docId = document.getElementById('id')
   let threadComment = document.getElementById('threadComment')
-  console.log(docId.textContent)
-  const washingtonRef = doc(db, "threads", );
+  console.log(docIDCont.textContent)
+  const washingtonRef = doc(db, "threads", docIDCont.textContent);
 // Set the "capital" field of the city 'DC'
 await updateDoc(washingtonRef, {
   [user.uid]: threadComment.value
 });
 }
 commentBut.addEventListener(`click`, addComment)
+document.addEventListener(`DOMContentLoaded`,()=>{
+  if(!localStorage.getItem(`userData`))
+  {
+    signOut(auth).then(() => {
+      alert('succesfully signed out')
+      location.href = './signin.html'
+    }).catch((error) => {
+      // An error happened.
+      console.log('sign in first')
+    });
+  }
+})
+window.addEventListener(`storage`,()=>{
+  if(!localStorage.getItem(`userData`))
+  {
+    signOut(auth).then(() => {
+      alert('succesfully signed out')
+      location.href = './signin.html'
+    }).catch((error) => {
+      // An error happened.
+      console.log('sign in first')
+    });
+  }
+})  

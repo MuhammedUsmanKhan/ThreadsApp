@@ -18,6 +18,30 @@ const auth = getAuth(app);
 //console.log(auth)
 const user = auth.currentUser
 //console.log(auth.authStateSubscription.auth.currentUser)
+window.addEventListener(`storage`,()=>{
+    if(!localStorage.getItem(`userData`))
+    {
+      signOut(auth).then(() => {
+        alert('succesfully signed out')
+        location.href = './signin.html'
+      }).catch((error) => {
+        // An error happened.
+        console.log('sign in first')
+      });
+    }
+})  
+document.addEventListener(`DOMContentLoaded`,()=>{
+    if(!localStorage.getItem(`userData`))
+    {
+      signOut(auth).then(() => {
+        alert('succesfully signed out')
+        location.href = './signin.html'
+      }).catch((error) => {
+        // An error happened.
+        console.log('sign in first')
+      });
+    }
+})
 document.addEventListener(`DOMContentLoaded`, () => {
 
     // 
@@ -95,3 +119,15 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
 })
 
+// document.addEventListener(`DOMContentLoaded`,()=>{
+//     if(!localStorage.getItem(`userData`))
+//     {
+//       signOut(auth).then(() => {
+//         alert('succesfully signed out')
+//         location.href = './signin.html'
+//       }).catch((error) => {
+//         // An error happened.
+//         console.log('sign in first')
+//       });
+//     }
+//   })
