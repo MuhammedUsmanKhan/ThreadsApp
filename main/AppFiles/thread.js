@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc , updateDoc , orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc , getDocs, updateDoc , orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClpo8swwA_PSFRGYDqOgWkVRwPjloDt5c",
@@ -47,19 +47,33 @@ modalOverlay.addEventListener('click', () => {
 let threadTitleInp = document.getElementById(`threadTitle`)
 let textArea = document.getElementById(`textArea`)
 let threadCreateBut = document.getElementById(`pollCreatedBut`)
+
+
 threadCreateBut.addEventListener(`click`, async () => {
   // Add a new document in collection "cities"
-  const userData = JSON.parse(localStorage.getItem(`userData`))
-  console.log(userData)
+  // const userData = JSON.parse(localStorage.getItem(`userData`))
+  // console.log(userData)
   const user = auth.currentUser;
   let userName;
-  console.log(user.email)
-  for (let i = 0; i < userData.length; i++) {
-    if (user.email == userData[i].emailID) {
-      console.log(userData[i].Name)
-       userName = userData[i].Name
+
+  const q = query(collection(db, "userDetails"));
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    console.log(doc.id, " => ", doc.data());
+  console.log(doc.data().userName)
+    if (user.email == doc.data().userEmail) {
+      console.log(doc.data().userName)
+       userName = doc.data().userName
+       console.log(userName)
     }
-  }
+  console.log(userName)
+  })
+
+  console.log(user.email)
+  //for (let i = 0; i < userData.length; i++) {
+    
+  //}
   console.log(user)
   try {
     if (threadTitleInp.value.trim().length != 0 && textArea.value.trim().length != 0) {
@@ -253,27 +267,27 @@ await updateDoc(washingtonRef, {
 });
 }
 commentBut.addEventListener(`click`, addComment)
-document.addEventListener(`DOMContentLoaded`,()=>{
-  if(!localStorage.getItem(`userData`))
-  {
-    signOut(auth).then(() => {
-      alert('succesfully signed out')
-      location.href = './signin.html'
-    }).catch((error) => {
-      // An error happened.
-      console.log('sign in first')
-    });
-  }
-})
-window.addEventListener(`storage`,()=>{
-  if(!localStorage.getItem(`userData`))
-  {
-    signOut(auth).then(() => {
-      alert('succesfully signed out')
-      location.href = './signin.html'
-    }).catch((error) => {
-      // An error happened.
-      console.log('sign in first')
-    });
-  }
-})  
+// document.addEventListener(`DOMContentLoaded`,()=>{
+//   // if(!localStorage.getItem(`userData`))
+//   // {
+//     signOut(auth).then(() => {
+//       alert('succesfully signed out')
+//       location.href = './signin.html'
+//     }).catch((error) => {
+//       // An error happened.
+//       console.log('sign in first')
+//     });
+//   //}
+// })
+// window.addEventListener(`storage`,()=>{
+//   // if(!localStorage.getItem(`userData`))
+//   // {
+//     signOut(auth).then(() => {
+//       alert('succesfully signed out')
+//       location.href = './signin.html'
+//     }).catch((error) => {
+//       // An error happened.
+//       console.log('sign in first')
+//     });
+//  // }
+// })  

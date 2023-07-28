@@ -26,3 +26,20 @@
       max-width: 1024px;
     }
   }
+      /* Customize the colors and animation as per your preference */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loader {
+  border-top-color: orange; /* Replace with your desired color */
+  border-right-color: blue; /* Replace with your desired color */
+  border-bottom-color: green; /* Replace with your desired color */
+  border-left-color: red;
+  animation: spin 2s infinite;
+}

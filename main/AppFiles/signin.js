@@ -18,30 +18,30 @@ import { getFirestore, collection, getDocs,addDoc, orderBy, serverTimestamp, que
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app)
+//const db = getFirestore(app)
 let but = document.querySelector(`#but`)
 but.addEventListener(`click`, async () => {
     
-  if(!localStorage.getItem(`userData`)){
+  //if(!localStorage.getItem(`userData`)){
 
-    let userData = []
-    const q = query(collection(db, "userDetails"));
+    //let userData = []
+    // const q = query(collection(db, "userDetails"));
 
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
+    // const querySnapshot = await getDocs(q);
+    // querySnapshot.forEach((doc) => {
+    //   console.log(doc.id, " => ", doc.data());
    
-      let obj = {
-            'Name' : doc.data().userName,
-            'emailID': doc.data().userEmail
-          }
+    //   let obj = {
+    //         'Name' : doc.data().userName,
+    //         'emailID': doc.data().userEmail
+    //       }
           
     //      if(!localStorage.getItem('userData')){
-              userData.push(obj)
+      //        userData.push(obj)
       
-    });
-    localStorage.setItem(`userData`,JSON.stringify(userData))
-  }
+    // });
+    //localStorage.setItem(`userData`,JSON.stringify(userData))
+  //}
   
   
   let email = document.querySelector(`#Semail`).value
@@ -58,7 +58,7 @@ but.addEventListener(`click`, async () => {
             const errorCode = error.code;
             const errorMessage = error.message;
         });
-})
+ })
 
 const CheckingUser = (user) => {
     if (user) {
