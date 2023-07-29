@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, setDoc, addDoc, orderBy, serverTimestamp, query, onSnapshot, where, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, updateDoc, setDoc, addDoc, orderBy, serverTimestamp, query, onSnapshot, where, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 
 const firebaseConfig = {
@@ -68,7 +68,7 @@ let viewPostDetails = async (event) => {
     }
 }
 
-
+//////////////////////Bringing Post Created By User On Thread Page////////////////////////////
 document.addEventListener(`DOMContentLoaded`, async () => {
 
     const q1 = query(collection(db, "userDetails"));
@@ -85,6 +85,8 @@ document.addEventListener(`DOMContentLoaded`, async () => {
 
     const q = query(collection(db, "threads"), orderBy("timestamp", "desc"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let threadList = document.getElementById(`threadList`)
+        threadList.innerHTML = ''
         const user = auth.currentUser
         querySnapshot.forEach((doc) => {
 
@@ -114,10 +116,10 @@ document.addEventListener(`DOMContentLoaded`, async () => {
                 const formattedDate = `${day} ${month} ${year}`;
                 p.textContent = 'Posted on ' + formattedDate;
 
-                let butdiv = document.createElement('button')
-                butdiv.setAttribute(`class`,`border-2 `)
-                let but2div = document.createElement('button')
-                but2div.setAttribute(`class`,`border-2`)
+                // let butdiv = document.createElement('button')
+                // butdiv.setAttribute(`class`, `border-2 `)
+                // let but2div = document.createElement('button')
+                // but2div.setAttribute(`class`, `border-2`)
                 const button = document.createElement('button');
                 button.setAttribute(`ref`, `${doc.id}`)
                 button.setAttribute(`class`, `ml-auto px-4 py-2 w-full text-center text-xs sm:text-normal font-semibold bg-blue-500 text-white rounded-full`)
@@ -129,7 +131,8 @@ document.addEventListener(`DOMContentLoaded`, async () => {
                 button2.setAttribute(`ref`, `${doc.id}`)
                 button2.setAttribute(`class`, `ml-auto px-4 py-2 w-full text-center text-xs sm:text-normal font-semibold bg-blue-500 text-white rounded-full`)
                 button2.textContent = 'Delete Post';
-          
+                button2.addEventListener(`click`, openmessageModal)
+                button2.addEventListener(`click`, dispmessageModel)
                 // Append elements to the list item
                 butCont.setAttribute(`class`, `flex flex-col justify-center p-1 sm:flex-row sm:space-x-2 sm:items-baseline sm:m-0 whitespace-nowrap items-center space-y-2`)
                 butCont.append(button, button2)
@@ -148,37 +151,193 @@ document.addEventListener(`DOMContentLoaded`, async () => {
     });
     //}
 
+    //////////////////Bringing BioDetails on Domload////////////////////
+
+    let userprofHeader = document.getElementById(`userprofHeader`)
+    let userBiography = document.getElementById(`userBiography`)
+
+    console.log(user)
+    const docRef = doc(db, "usersProfileDetails", user.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        userprofHeader.textContent = docSnap.data().Header
+        userBiography.textContent = docSnap.data().Biography
+    } else {
+        // docSnap.data() will be undefined in this case
+        console.log("Add Biodata");
+    }
 
 })
+///////////////////////////Edit|Bio-Button-Modal////////////////////////////////
+let editBioBut = document.getElementById(`editBio`)
+const modal = document.getElementById('createPollModal');
+const closeModal = modal.getElementsByClassName('createPoll-modal-close')[0];
+const modalContainer = modal.getElementsByClassName('createPoll-modal-container')[0];
+const modalOverlay = modal.getElementsByClassName('createPoll-modal-overlay')[0];
+editBioBut.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.add('modal-open');
+        modalContainer.classList.add('modal-container-open');
+    }, 50);
+});
+closeModal.addEventListener('click', () => {
+    modal.classList.remove('modal-open');
+    modalContainer.classList.remove('modal-container-open');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+});
+modalOverlay.addEventListener('click', () => {
+    modal.classList.remove('modal-open');
+    modalContainer.classList.remove('modal-container-open');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+});
+///////////////////////////Edit|Bio prevInput value///////////////////////
+let prevInputVal = () => {
 
-// let userAddProfInfo = async () => {
+    let profHeader = document.getElementById(`profHeader`)
+    let profBio = document.getElementById(`profBio`)
+    let userprofHeader = document.getElementById(`userprofHeader`)
+    let userBiography = document.getElementById(`userBiography`)
 
-//     const user = auth.currentUser
+    profHeader.value = userprofHeader.textContent
+    profBio.value = userBiography.textContent
+}
 
-//     let profHeader = document.getElementById(`profHeader`)
-//     let userBiography = document.getElementById(`userBiography`)
+editBioBut.addEventListener(`click`, prevInputVal)
+
+//////////////////////Edit Bio Main Function//////////////////
+
+let editBio = async () => {
+
+    let profHeader = document.getElementById(`profHeader`)
+    let profBio = document.getElementById(`profBio`)
+    let userprofHeader = document.getElementById(`userprofHeader`)
+    let userBiography = document.getElementById(`userBiography`)
+    const user = auth.currentUser
+    const docRef = doc(db, "usersProfileDetails", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+
+        const washingtonRef = doc(db, "usersProfileDetails", docSnap.id);
+        // Set the "capital" field of the city 'DC'
+        await updateDoc(washingtonRef, {
+            Header: profHeader.value,
+            Biography: profBio.value
+        });
+        userprofHeader.textContent = profHeader.value
+        userBiography.textContent = profBio.value
+    } else {
+        // docSnap.data() will be undefined in this case
+        // addBiography
+        // console.log("No such document!");
+        //////////////////Adding User Bio Details in DB/////////////////////////////////
+        let profHeader = document.getElementById(`profHeader`)
+        let profBio = document.getElementById(`profBio`)
+        let userprofHeader = document.getElementById(`userprofHeader`)
+        let userBiography = document.getElementById(`userBiography`)
+
+        const user = auth.currentUser
+        await setDoc(doc(db, "usersProfileDetails", user.uid), {
+            Name: profileUser.textContent,
+            Biography: profBio.value,
+            Header: profHeader.value
+        });
+
+        userBiography.textContent = profBio.value
+        userprofHeader.textContent = profHeader.value
+
+    }
+
+}
+let BioInfosubmitBut = document.getElementById(`Bio-Info-submitBut`)
+BioInfosubmitBut.addEventListener(`click`, editBio)
 
 
-//     console.log(user.uid)
+const messageDisplayModal = document.getElementById('myModal');
+const messagecloseModal = messageDisplayModal.getElementsByClassName('error-modal-close')[0];
+const messagemodalContainer = messageDisplayModal.getElementsByClassName('error-modal-container')[0];
+const messagemodalOverlay = messageDisplayModal.getElementsByClassName('error-modal-overlay')[0];
+///////////////////////////////Messgae Respond Modal///////////////////////////////////
 
-//     await setDoc(doc(db, "userProfileInfo", user.uid), {
-//         userName: profileUser.textContent,
-//         Biography: userBiography.textContent,
-//         Header: "USA"
-//     });
+let openmessageModal = async (event) => {
+    event.preventDefault()
+    console.log(event.target.getAttribute(`ref`))
+    let refDoc = event.target.getAttribute(`ref`)
+    const postDoc = await deleteDoc(doc(db, "threads", refDoc));
+    if (!postDoc) {
+        const modalText = document.getElementById(`Response`);
+        modalText.innerText = `Post has been Succesfully Deleted`
+    }
+    //console.log(modalText.innerText)
+    //console.log(error.data)
+    messageDisplayModal.classList.remove('hidden');
+    setTimeout(() => {
+        messageDisplayModal.classList.add('modal-open');
+        messagemodalContainer.classList.add('modal-container-open');
+    }, 50);
 
-// }
-// Add a new document in collection "cities"
+}
 
-// document.addEventListener(`DOMContentLoaded`,()=>{
-//     if(!localStorage.getItem(`userData`))
-//     {
-//       signOut(auth).then(() => {
-//         alert('succesfully signed out')
-//         location.href = './signin.html'
-//       }).catch((error) => {
-//         // An error happened.
-//         console.log('sign in first')
-//       });
-//     }
-//   })
+let dispmessageModel = () => {
+    messagecloseModal.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagemodalOverlay.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagecloseModal.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagemodalOverlay.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+
+}
+
+
+
+const CheckingUser = (user) => {
+    if (user) {
+      
+      console.log('User is logged in:', user.email);
+
+    } else {
+    
+      console.log('User is logged out');
+      location.href = `./signin.html`;
+
+    }
+  };
+  
+  onAuthStateChanged(auth, CheckingUser)
+
+
+
+

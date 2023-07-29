@@ -17,6 +17,7 @@ const auth = getAuth(app);
 //const userss = auth.currentUser;
 //console.log(userss)
 //console.log(userss.currentUser.email)
+////////////////////////////Create Post Modal/////////////////////////////////////////////////
 const addpollBut = document.getElementById('openModal');
 const modal = document.getElementById('createPollModal');
 const closeModal = modal.getElementsByClassName('createPoll-modal-close')[0];
@@ -48,7 +49,7 @@ let threadTitleInp = document.getElementById(`threadTitle`)
 let textArea = document.getElementById(`textArea`)
 let threadCreateBut = document.getElementById(`pollCreatedBut`)
 
-
+////////////////////////////////////////Adding Post in Dom//////////////////////////////////////////
 threadCreateBut.addEventListener(`click`, async () => {
   // Add a new document in collection "cities"
   // const userData = JSON.parse(localStorage.getItem(`userData`))
@@ -105,21 +106,7 @@ threadCreateBut.addEventListener(`click`, async () => {
 
 })
 
-let userMenuButton = document.getElementById(`user-menu-button`)
-let userMenuDropDown = document.getElementById(`userMenuDropdown`)
-userMenuButton.addEventListener(`click`, (event) => {
-  event.preventDefault()
-  userMenuDropDown.classList.remove(`hidden`)
-})
-let signOutMenu = document.getElementById(`signOutMenu`)
-signOutMenu.addEventListener(`click`, () => {
-  signOut(auth).then(() => {
-    alert('succesfully signed out')
-    location.href = './signin.html'
-  }).catch((error) => {
-    // An error happened.
-  });
-})
+/////////////////////////////////Displaying-Threads on Dom Load or after any Change/////////////////////////////////////
 let displayThreads = () => {
   const q = query(collection(db, "threads"),orderBy("timestamp", "desc"));
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -267,27 +254,41 @@ await updateDoc(washingtonRef, {
 });
 }
 commentBut.addEventListener(`click`, addComment)
-// document.addEventListener(`DOMContentLoaded`,()=>{
-//   // if(!localStorage.getItem(`userData`))
-//   // {
-//     signOut(auth).then(() => {
-//       alert('succesfully signed out')
-//       location.href = './signin.html'
-//     }).catch((error) => {
-//       // An error happened.
-//       console.log('sign in first')
-//     });
-//   //}
-// })
-// window.addEventListener(`storage`,()=>{
-//   // if(!localStorage.getItem(`userData`))
-//   // {
-//     signOut(auth).then(() => {
-//       alert('succesfully signed out')
-//       location.href = './signin.html'
-//     }).catch((error) => {
-//       // An error happened.
-//       console.log('sign in first')
-//     });
-//  // }
-// })  
+ 
+////////////////////////Sign-Out/////////////////////////////////////
+
+let userMenuButton = document.getElementById(`user-menu-button`)
+let userMenuDropDown = document.getElementById(`userMenuDropdown`)
+userMenuButton.addEventListener(`click`, (event) => {
+  event.preventDefault()
+  userMenuDropDown.classList.remove(`hidden`)
+})
+let signOutMenu = document.getElementById(`signOutMenu`)
+signOutMenu.addEventListener(`click`, () => {
+  signOut(auth).then(() => {
+    alert('succesfully signed out')
+    location.href = './signin.html'
+  }).catch((error) => {
+    // An error happened.
+  });
+})
+
+/////////////////////////////Checking-User///////////////////////////////
+const CheckingUser = (user) => {
+  if (user) {
+    
+    console.log('User is logged in:', user.email);
+
+  } else {
+  
+    console.log('User is logged out');
+    location.href = `./signin.html`;
+
+  }
+};
+
+onAuthStateChanged(auth, CheckingUser)
+
+
+
+
