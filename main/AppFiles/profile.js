@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import { getFirestore, collection, getDocs, updateDoc, setDoc, addDoc, orderBy, serverTimestamp, query, onSnapshot, where, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyClpo8swwA_PSFRGYDqOgWkVRwPjloDt5c",
@@ -15,8 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-//console.log(auth)
-const user = auth.currentUser
+const storage = getStorage(app);
+
 
 let profileUser = document.getElementById(`userName`)
 
@@ -74,6 +74,8 @@ document.addEventListener(`DOMContentLoaded`, async () => {
     const q1 = query(collection(db, "userDetails"));
     const querySnapshot = await getDocs(q1);
     const user = auth.currentUser
+    //    const user = auth.currentUser
+
     querySnapshot.forEach((doc) => {
         console.log(doc.id, " => ", doc.data());
         console.log(doc.data().userName)
@@ -90,7 +92,7 @@ document.addEventListener(`DOMContentLoaded`, async () => {
         const user = auth.currentUser
         querySnapshot.forEach((doc) => {
 
-            if (user.uid == doc.data().userID) {
+            if (user.uid == doc.data().uid) {
                 console.log(doc.id)
                 const li = document.createElement('li');
                 const dataCont = document.createElement(`div`);
@@ -323,20 +325,33 @@ let dispmessageModel = () => {
 
 
 
+
 const CheckingUser = (user) => {
     if (user) {
-      
-      console.log('User is logged in:', user.email);
+
+        console.log('User is logged in:', user.email);
+        console.log(user.uid)
+        getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+            .then((url) => {
+                // `url` is the download URL for 'images/stars.jpg
+                // Or inserted into an <img> element
+                const img = document.getElementById('userProfImg');
+                img.setAttribute('src', url);
+            })
+            .catch((error) => {
+                // Handle any errors
+            });
+
 
     } else {
-    
-      console.log('User is logged out');
-      location.href = `./signin.html`;
+
+        console.log('User is logged out');
+        location.href = `./signin.html`;
 
     }
-  };
-  
-  onAuthStateChanged(auth, CheckingUser)
+};
+
+onAuthStateChanged(auth, CheckingUser)
 
 
 

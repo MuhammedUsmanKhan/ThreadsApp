@@ -30,11 +30,11 @@
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-indigo-100">
   <div class="container mx-auto px-4 py-8">
     <div class="flex  justify-between items-start ">
       <div class=" ">
-        <h1 class="text-3xl font-bold mb-4">Threads</h1>
+        <h1 class="text-3xl text-blue-700 font-bold mb-4">Threads</h1>
       </div>
       <div class="flex w-full justify-center">
         <button id="openModal"
@@ -50,7 +50,7 @@
               <span class="sr-only">Open user menu</span>
               <img class="h-11 w-12 sm:w-11 rounded-full"
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt="">
+                alt="Pfp not found" id="userProfImg">
             </button>
           </div>
           <div
@@ -59,9 +59,9 @@
             tabindex="-1">
             <!-- Active: "bg-gray-100", Not Active: "" -->
             <a href="./profile.html" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-            id="visitProfMenu">Visit Profile</a>
+              id="visitProfMenu">Visit Profile</a>
             <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-              id="signOutMenu">Sign out</a>    
+              id="signOutMenu">Sign out</a>
           </div>
         </div>
 
@@ -137,14 +137,15 @@
           </div>
           <div class="flex justify-between py-2 border-b-2 border-white border-solid items-center pb-3">
             <div class="rounded-full w-24 h-24 mx-auto mt-6 bg-gradient-to-tr from-indigo-500 to-indigo-600 p-2">
-              <img class="rounded-full w-full h-full border-4 border-white" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Profile Image">
+              <img id="usermodalProfImg" class="rounded-full w-full h-full border-4 border-white" alt="Profile Image">
             </div>
           </div>
           <!-- Modal body -->
           <div class="flex flex-col py-2 space-y-6 px-6 ">
-            <p id="Title" class="text-2xl font-bold text-white px-6 text-center" >Thread Title</p>
+            <p id="Title" class="text-2xl font-bold text-white px-6 text-center">Thread Title</p>
             <div class="text-white font-medium">
-              <p id="threadContent" class="break-words" >Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque luctus finibus erat, id auctor quam
+              <p id="threadContent" class="break-words">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
+                luctus finibus erat, id auctor quam
                 iaculis ac. Integer a tortor non orci sagittis efficitur sed et diam.</p>
             </div>
           </div>
@@ -159,19 +160,22 @@
             <label for="threadTitle"
               class="absolute text-sm peer-focus:text-xs bottom-[1.2rem] left-4 text-white font-semibold peer-focus:bg-[#ffcc01] peer-focus:transform peer-focus:-translate-y-6 peer-focus:pl-1 peer-focus:pr-1 duration-500 transition-all">Enter
               Your Comment</label>
-            <div id="" class="flex items-center text-white font-semibold hover:text-[#ffcc01] hover:border-[#ffcc01] hover:bg-white ml-1 border-2 p-2">
-              <button id="postComment">Post</button>
-              <span class="hidden" id="docIDCont"></span>
+            <div id=""
+              class="flex items-center text-white font-semibold hover:text-[#ffcc01] hover:border-[#ffcc01] hover:bg-white ml-1 border-2 p-2">
+              <button id="postComment" ref="">Post</button>
+              <!-- <span class="hidden" id="docIDCont"></span> -->
             </div>
           </div>
-          <div class="commentContainer ">
-            
+          <div id="commentContainer" class="p-2 ">
+            <ul id="commentlistContainer" class="h-16 overflow-y-scroll">
+              
+            </ul>
           </div>
         </div>
       </div>
     </div>
-
   </div>
+  <script src="https://kit.fontawesome.com/5a0b948d4f.js" crossorigin="anonymous"></script>
   <script type="module" src="./AppFiles/thread.js"></script>
 </body>
 

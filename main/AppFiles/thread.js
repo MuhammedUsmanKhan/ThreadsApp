@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc , getDocs, updateDoc , orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClpo8swwA_PSFRGYDqOgWkVRwPjloDt5c",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app)
 //const userss = auth.currentUser;
 //console.log(userss)
 //console.log(userss.currentUser.email)
@@ -62,18 +64,18 @@ threadCreateBut.addEventListener(`click`, async () => {
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
     console.log(doc.id, " => ", doc.data());
-  console.log(doc.data().userName)
+    console.log(doc.data().userName)
     if (user.email == doc.data().userEmail) {
       console.log(doc.data().userName)
-       userName = doc.data().userName
-       console.log(userName)
+      userName = doc.data().userName
+      console.log(userName)
     }
-  console.log(userName)
+    console.log(userName)
   })
 
   console.log(user.email)
   //for (let i = 0; i < userData.length; i++) {
-    
+
   //}
   console.log(user)
   try {
@@ -82,7 +84,7 @@ threadCreateBut.addEventListener(`click`, async () => {
         threadTitle: threadTitleInp.value,
         threadContent: textArea.value,
         userName: userName,
-        userID: user.uid,
+        uid: user.uid,
         userEmail: user.email,
         timestamp: serverTimestamp(),
       });
@@ -108,26 +110,26 @@ threadCreateBut.addEventListener(`click`, async () => {
 
 /////////////////////////////////Displaying-Threads on Dom Load or after any Change/////////////////////////////////////
 let displayThreads = () => {
-  const q = query(collection(db, "threads"),orderBy("timestamp", "desc"));
+  const q = query(collection(db, "threads"), orderBy("timestamp", "desc"));
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const threadList = document.getElementById("threadList");
     threadList.innerHTML = " "
     querySnapshot.forEach((doc) => {
       console.log(doc.data())
-      const docID = document.createElement(`span`)
-      docID.setAttribute(`class`, `hidden`)
+      // const docID = document.createElement(`span`)
+      // docID.setAttribute(`class`, `hidden`)
       //docID.setAttribute(`id`,`id`)
-      docID.textContent = doc.id
+      //docID.textContent = doc.id
       // Create the list item element
       const listItem = document.createElement("li");
-      listItem.setAttribute("class", "bg-white rounded-lg shadow-md p-6 flex flex-col justify-between");
+      listItem.setAttribute("class", "bg-[#C6E2FF] rounded-lg shadow-md p-6 flex flex-col justify-between");
 
       // Create the first inner div
       const firstDiv = document.createElement("div");
 
       // Create the thread title heading element and add content
       const threadTitle = document.createElement("h2");
-      threadTitle.setAttribute("class", "text-2xl font-semibold mb-2");
+      threadTitle.setAttribute("class", "text-2xl text-blue-700 font-semibold mb-2");
       threadTitle.textContent = `${doc.data().threadTitle}`;
 
       // Create the paragraph element for the author and add content
@@ -168,13 +170,15 @@ let displayThreads = () => {
       const viewButton = document.createElement("button");
       viewButton.setAttribute("class", "text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none");
       viewButton.setAttribute(`id`, `myViewModal`)
+      viewButton.setAttribute(`ref`, doc.id)
       viewButton.addEventListener(`click`, openViewModal)
       viewButton.addEventListener(`click`, displayUserThreadInfo)
+      viewButton.addEventListener(`click`, displayComm)
       viewButton.textContent = "View";
 
       // Append the inner div and button to the second inner div
       secondDiv.appendChild(innerDiv);
-      secondDiv.append(viewButton, docID);
+      secondDiv.appendChild(viewButton);
 
       // Append both inner divs to the list item
       listItem.appendChild(firstDiv);
@@ -216,45 +220,215 @@ viewModalOverlay.addEventListener('click', () => {
 });
 let displayUserThreadInfo = async (event) => {
   event.preventDefault()
-  console.log(event.target.nextElementSibling)
-  const docID = event.target.nextElementSibling.textContent;
+  //console.log(event.target.nextElementSibling)
+  const docID = event.target.getAttribute(`ref`);
   const docRef = doc(db, "threads", docID);
   const docSnap = await getDoc(docRef);
+  //const user = auth.currentUser
   const threadTitle = document.getElementById(`Title`)
   const threadContent = document.getElementById(`threadContent`)
-  const docIDCont = document.getElementById(`docIDCont`)
+  const docIDOnPostButton = document.getElementById(`postComment`)
   //threadContent.setAttribute(`class`,``)  
   if (docSnap.exists()) {
     console.log("Document data:", docSnap.data());
     console.log(docSnap.data().threadTitle)
+    /////////Uploading modal user image/////////////////
+    let user = docSnap.data()
+    console.log(user.uid)
+    //console.log(userid)
+    getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+      .then((url) => {
+        console.log(url)
+        const img = document.getElementById('usermodalProfImg');
+        img.setAttribute('src', url);
+      })
+      .catch((error) => {
+        console.log(`image not found`)
+      });
     threadTitle.textContent = docSnap.data().threadTitle
     threadContent.textContent = docSnap.data().threadContent
-    docIDCont.textContent = docID
+    docIDOnPostButton.setAttribute(`ref`, docID)
   } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
   }
- // return docID
+  // return docID
 }
 let commentBut = document.getElementById(`postComment`)
-let addComment = async (e) =>{
+let commentlistContainer = document.getElementById(`commentlistContainer`)
+let addComment = async (e) => {
   e.preventDefault();
-  const docIDCont = document.getElementById(`docIDCont`)
-
+  const docIDCont = e.target.getAttribute(`ref`)
+  console.log(docIDCont)
   //e.target
   let user = auth.currentUser
   // console.log(user)
   //let docId = document.getElementById('id')
+  //let commentsArr = []
   let threadComment = document.getElementById('threadComment')
-  console.log(docIDCont.textContent)
-  const washingtonRef = doc(db, "threads", docIDCont.textContent);
-// Set the "capital" field of the city 'DC'
-await updateDoc(washingtonRef, {
-  [user.uid]: threadComment.value
-});
+  let comment  = threadComment.value
+
+  //console.log(docIDCont.textContent)
+  const washingtonRef = doc(db, "threads", docIDCont);
+  // Set the "capital" field of the city 'DC'
+  await updateDoc(washingtonRef, {
+    [user.uid]: comment
+  });
+  //user.uid will go as a ref to para and when we will display messages on load, the messages will come back to their
+  //respective paras
+  //ontime
+  const li = document.createElement("li");
+  li.className = "flex justify-between w-full";
+
+  const commentContainer = document.createElement("div");
+  commentContainer.className = "flex w-10/12 items-center space-x-2";
+
+  const image = document.createElement("img");
+
+  getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+    .then((url) => {
+      // `url` is the download URL for 'images/stars.jpg
+      // Or inserted into an <img> element
+      image.className = "h-11 w-12 sm:w-11 rounded-full";
+      image.setAttribute('src', url);
+      image.alt = "User Image";
+    })
+    .catch((error) => {
+      // Handle any errors
+    });
+
+  const content = document.createElement("p");
+  content.className = "border-2 p-2 w-full";
+  content.textContent = threadComment.value;
+
+  commentContainer.appendChild(image);
+  commentContainer.appendChild(content);
+
+  const actionsContainer = document.createElement("div");
+  actionsContainer.className = "flex flex-col space-y-1 items-center";
+
+  const editButton = document.createElement("button");
+  editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
+
+  const deleteButton = document.createElement("button");
+  deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
+
+  actionsContainer.appendChild(editButton);
+  actionsContainer.appendChild(deleteButton);
+
+  li.appendChild(commentContainer);
+  li.appendChild(actionsContainer);
+
+  commentlistContainer.appendChild(li)
+
+
 }
 commentBut.addEventListener(`click`, addComment)
- 
+
+//ondomload
+let displayComm = async (event) => {
+
+  let commentlistContainer = document.getElementById(`commentlistContainer`)
+
+  const q = query(collection(db, "userDetails"));
+
+  const querySnapshot = await getDocs(q);
+  commentlistContainer.innerHTML = ``
+  querySnapshot.forEach(async (eachdoc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(eachdoc.id, " => ", eachdoc.data());
+
+
+    const docID = event.target.getAttribute(`ref`);
+    const docRef = doc(db, "threads", docID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      console.log("Document data:", docSnap.data());
+
+      if (docSnap.data()[eachdoc.id]) {
+
+        let commentlistContainer = document.getElementById(`commentlistContainer`)
+
+        const li = document.createElement("li");
+        li.className = "flex justify-between w-full";
+
+        const commentContainer = document.createElement("div");
+        commentContainer.className = "flex w-10/12 items-center space-x-2";
+
+        const image = document.createElement("img");
+
+        getDownloadURL(ref(storage, 'users/' + eachdoc.id + '/profile.jpg'))
+          .then((url) => {
+            // `url` is the download URL for 'images/stars.jpg
+            // Or inserted into an <img> element
+            image.className = "h-11 w-12 sm:w-11 rounded-full";
+            image.setAttribute('src', url);
+            image.alt = "User Image";
+          })
+          .catch((error) => {
+            // Handle any errors
+          });
+
+        const content = document.createElement("p");
+        content.className = "border-2 p-2 w-full";
+        content.textContent = docSnap.data()[eachdoc.id];
+
+        commentContainer.appendChild(image);
+        commentContainer.appendChild(content);
+
+        const actionsContainer = document.createElement("div");
+        actionsContainer.className = "flex flex-col space-y-1 items-center";
+
+        const editButton = document.createElement("button");
+        editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
+
+        const deleteButton = document.createElement("button");
+        deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
+
+        actionsContainer.appendChild(editButton);
+        actionsContainer.appendChild(deleteButton);
+
+        li.appendChild(commentContainer);
+        li.appendChild(actionsContainer);
+
+        commentlistContainer.appendChild(li)
+
+      }
+      else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+
+
+    }
+  });
+
+
+
+
+}
+
+
+
+// let displayComm = async () => {
+
+
+//   const docRef = doc(db, "cities", "SF");
+//   const docSnap = await getDoc(docRef);
+
+//   if (docSnap.exists()) {
+//     console.log("Document data:", docSnap.data());
+//   } else {
+//     // docSnap.data() will be undefined in this case
+//     console.log("No such document!");
+//   }
+
+
+
+// }
+
+
+
 ////////////////////////Sign-Out/////////////////////////////////////
 
 let userMenuButton = document.getElementById(`user-menu-button`)
@@ -276,11 +450,23 @@ signOutMenu.addEventListener(`click`, () => {
 /////////////////////////////Checking-User///////////////////////////////
 const CheckingUser = (user) => {
   if (user) {
-    
+
     console.log('User is logged in:', user.email);
+    console.log(user.uid)
+    getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+      .then((url) => {
+        // `url` is the download URL for 'images/stars.jpg
+        // Or inserted into an <img> element
+        const img = document.getElementById('userProfImg');
+        img.setAttribute('src', url);
+      })
+      .catch((error) => {
+        // Handle any errors
+      });
+
 
   } else {
-  
+
     console.log('User is logged out');
     location.href = `./signin.html`;
 

@@ -56,6 +56,8 @@ but.addEventListener(`click`, () => {
       const user = userCredential.user;
       console.log(user.uid)
       console.log(file)
+      // /usersProfileImage
+      
       const storageRef = ref(storage, 'users/' + user.uid + '/profile.jpg')
       // 'file' comes from the Blob or File API
       uploadBytes(storageRef, file).then((snapshot) => {
