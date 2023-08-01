@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, arrayUnion, arrayRemove, collection, addDoc, getDocs, updateDoc, orderBy, serverTimestamp, query, onSnapshot, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -266,14 +266,35 @@ let addComment = async (e) => {
   //let docId = document.getElementById('id')
   //let commentsArr = []
   let threadComment = document.getElementById('threadComment')
-  let comment  = threadComment.value
+  let comment = threadComment.value
+  const docRef = doc(db, "threads", docIDCont);
+  const docSnap = await getDoc(docRef);
 
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+    //    console.log(docSnap.data().hasOwnProperty(user.uid))
+    if (!docSnap.data().hasOwnProperty(user.uid)) {
+      const washingtonRef = doc(db, "threads", docIDCont);
+      // Set the "capital" field of the city 'DC'
+      console.log(washingtonRef)
+      await updateDoc(washingtonRef, {
+        [user.uid]: [comment]
+      });
+    }
+    else {
+      //    console.log(docSnap.data().hasOwnProperty(docIDCont))
+      const washingtonRef = doc(db, "threads", docIDCont);
+      // Atomically add a new region to the "regions" array field.
+      await updateDoc(washingtonRef, {
+        [user.uid]: arrayUnion(comment)
+      });
+    }
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
   //console.log(docIDCont.textContent)
-  const washingtonRef = doc(db, "threads", docIDCont);
-  // Set the "capital" field of the city 'DC'
-  await updateDoc(washingtonRef, {
-    [user.uid]: comment
-  });
+
   //user.uid will go as a ref to para and when we will display messages on load, the messages will come back to their
   //respective paras
   //ontime
@@ -342,56 +363,76 @@ let displayComm = async (event) => {
     const docID = event.target.getAttribute(`ref`);
     const docRef = doc(db, "threads", docID);
     const docSnap = await getDoc(docRef);
+
     if (docSnap.exists()) {
       console.log("Document data:", docSnap.data());
 
       if (docSnap.data()[eachdoc.id]) {
 
-        let commentlistContainer = document.getElementById(`commentlistContainer`)
+        for (let i = 0; i < docSnap.data()[eachdoc.id].length; i++) {
 
-        const li = document.createElement("li");
-        li.className = "flex justify-between w-full";
+          console.log(docSnap.data())
+          let commentlistContainer = document.getElementById(`commentlistContainer`)
 
-        const commentContainer = document.createElement("div");
-        commentContainer.className = "flex w-10/12 items-center space-x-2";
+          const li = document.createElement("li");
+          li.className = "flex  w-full";
 
-        const image = document.createElement("img");
+          const commentContainer = document.createElement("div");
+          commentContainer.className = "flex w-11/12  space-x-2";
 
-        getDownloadURL(ref(storage, 'users/' + eachdoc.id + '/profile.jpg'))
-          .then((url) => {
-            // `url` is the download URL for 'images/stars.jpg
-            // Or inserted into an <img> element
-            image.className = "h-11 w-12 sm:w-11 rounded-full";
-            image.setAttribute('src', url);
-            image.alt = "User Image";
-          })
-          .catch((error) => {
-            // Handle any errors
-          });
+          const image = document.createElement("img");
 
-        const content = document.createElement("p");
-        content.className = "border-2 p-2 w-full";
-        content.textContent = docSnap.data()[eachdoc.id];
+          getDownloadURL(ref(storage, 'users/' + eachdoc.id + '/profile.jpg'))
+            .then((url) => {
+              // `url` is the download URL for 'images/stars.jpg
+              // Or inserted into an <img> element
+              image.className = "h-11 w-12 sm:w-11 rounded-full";
+              image.setAttribute('src', url);
+              image.alt = "User Image";
+            })
+            .catch((error) => {
+              // Handle any errors
+              image.alt = "Profile Image not Found";
+            });
 
-        commentContainer.appendChild(image);
-        commentContainer.appendChild(content);
+          const content = document.createElement("p");
+          content.className = "border-2 p-2 ";
+          content.textContent = docSnap.data()[eachdoc.id][i];
 
-        const actionsContainer = document.createElement("div");
-        actionsContainer.className = "flex flex-col space-y-1 items-center";
+          commentContainer.appendChild(image);
+          commentContainer.appendChild(content);
 
-        const editButton = document.createElement("button");
-        editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
+          li.appendChild(commentContainer);
+          let user = auth.currentUser
 
-        const deleteButton = document.createElement("button");
-        deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
+          console.log(user.uid)
+          console.log(docSnap.data()[user.uid])
+          console.log(docSnap.data()[eachdoc.id][i])
+          if (typeof docSnap.data()[user.uid] != "undefined") {
 
-        actionsContainer.appendChild(editButton);
-        actionsContainer.appendChild(deleteButton);
+            if (docSnap.data()[user.uid][i] == docSnap.data()[eachdoc.id][i]) {
 
-        li.appendChild(commentContainer);
-        li.appendChild(actionsContainer);
+              const actionsContainer = document.createElement("div");
+              actionsContainer.className = "flex flex-col  items-center";
 
-        commentlistContainer.appendChild(li)
+              const editButton = document.createElement("button");
+              editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
+
+              const deleteButton = document.createElement("button");
+              deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
+
+              actionsContainer.appendChild(editButton);
+              actionsContainer.appendChild(deleteButton);
+
+              li.appendChild(actionsContainer);
+
+            }
+          }
+
+
+          commentlistContainer.appendChild(li)
+
+        }
 
       }
       else {
