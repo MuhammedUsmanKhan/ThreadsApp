@@ -129,13 +129,13 @@ let displayThreads = () => {
 
       // Create the thread title heading element and add content
       const threadTitle = document.createElement("h2");
-      threadTitle.setAttribute("class", "text-2xl text-blue-700 font-semibold mb-2");
+      threadTitle.setAttribute("class", "text-2xl text-blue-500 font-semibold mb-2");
       threadTitle.textContent = `${doc.data().threadTitle}`;
 
       // Create the paragraph element for the author and add content
       const authorParagraph = document.createElement("p");
       authorParagraph.setAttribute("class", "text-gray-600 text-sm");
-      authorParagraph.innerHTML = `By <span class='text-indigo-600'>${doc.data().userName}</span>`;
+      authorParagraph.innerHTML = `By <span class='text-blue-600'>${doc.data().userName}</span>`;
 
       // Append the heading and paragraph to the first inner div
       firstDiv.appendChild(threadTitle);
@@ -168,7 +168,7 @@ let displayThreads = () => {
 
       // Create the button element
       const viewButton = document.createElement("button");
-      viewButton.setAttribute("class", "text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none");
+      viewButton.setAttribute("class", "text-white bg-blue-500 hover:bg-blue-600 rounded-lg px-4 py-2 text-sm font-semibold focus:outline-none");
       viewButton.setAttribute(`id`, `myViewModal`)
       viewButton.setAttribute(`ref`, doc.id)
       viewButton.addEventListener(`click`, openViewModal)
@@ -270,7 +270,7 @@ let addComment = async (e) => {
   const docRef = doc(db, "threads", docIDCont);
   const docSnap = await getDoc(docRef);
 
-  if (docSnap.exists()) {
+  if (docSnap.exists() && comment.trim().length != 0) {
     console.log("Document data:", docSnap.data());
     //    console.log(docSnap.data().hasOwnProperty(user.uid))
     if (!docSnap.data().hasOwnProperty(user.uid)) {
@@ -289,6 +289,53 @@ let addComment = async (e) => {
         [user.uid]: arrayUnion(comment)
       });
     }
+    const li = document.createElement("li");
+    li.className = "flex justify-between w-full";
+
+    const commentContainer = document.createElement("div");
+    commentContainer.className = "flex w-11/12  space-x-2";
+
+    const image = document.createElement("img");
+
+    getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+      .then((url) => {
+        // `url` is the download URL for 'images/stars.jpg
+        // Or inserted into an <img> element
+        image.className = "h-11 w-12 sm:w-11 rounded-full";
+        image.setAttribute('src', url);
+        image.alt = "User Image";
+      })
+      .catch((error) => {
+        // Handle any errors
+      });
+
+    const content = document.createElement("p");
+    content.className = "border-2 text-white p-2 ";
+    content.textContent = threadComment.value;
+
+    commentContainer.appendChild(image);
+    commentContainer.appendChild(content);
+
+    const actionsContainer = document.createElement("div");
+    actionsContainer.className = "flex flex-col  items-center";
+
+    const editButton = document.createElement("button");
+    editButton.setAttribute(`ref`, `${docIDCont}`)
+    editButton.addEventListener(`click`, editComment)
+    editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
+
+    const deleteButton = document.createElement("button");
+    deleteButton.setAttribute(`ref`, `${docIDCont}`)
+    deleteButton.addEventListener(`click`, delComment)
+    deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
+
+    actionsContainer.appendChild(editButton);
+    actionsContainer.appendChild(deleteButton);
+
+    li.appendChild(commentContainer);
+    li.appendChild(actionsContainer);
+
+    commentlistContainer.appendChild(li)
   } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
@@ -298,51 +345,6 @@ let addComment = async (e) => {
   //user.uid will go as a ref to para and when we will display messages on load, the messages will come back to their
   //respective paras
   //ontime
-  const li = document.createElement("li");
-  li.className = "flex justify-between w-full";
-
-  const commentContainer = document.createElement("div");
-  commentContainer.className = "flex w-10/12 items-center space-x-2";
-
-  const image = document.createElement("img");
-
-  getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
-    .then((url) => {
-      // `url` is the download URL for 'images/stars.jpg
-      // Or inserted into an <img> element
-      image.className = "h-11 w-12 sm:w-11 rounded-full";
-      image.setAttribute('src', url);
-      image.alt = "User Image";
-    })
-    .catch((error) => {
-      // Handle any errors
-    });
-
-  const content = document.createElement("p");
-  content.className = "border-2 p-2 w-full";
-  content.textContent = threadComment.value;
-
-  commentContainer.appendChild(image);
-  commentContainer.appendChild(content);
-
-  const actionsContainer = document.createElement("div");
-  actionsContainer.className = "flex flex-col space-y-1 items-center";
-
-  const editButton = document.createElement("button");
-  editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
-
-  const deleteButton = document.createElement("button");
-  deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
-
-  actionsContainer.appendChild(editButton);
-  actionsContainer.appendChild(deleteButton);
-
-  li.appendChild(commentContainer);
-  li.appendChild(actionsContainer);
-
-  commentlistContainer.appendChild(li)
-
-
 }
 commentBut.addEventListener(`click`, addComment)
 
@@ -396,7 +398,7 @@ let displayComm = async (event) => {
             });
 
           const content = document.createElement("p");
-          content.className = "border-2 p-2 ";
+          content.className = "border-2 text-white p-2 ";
           content.textContent = docSnap.data()[eachdoc.id][i];
 
           commentContainer.appendChild(image);
@@ -412,13 +414,18 @@ let displayComm = async (event) => {
 
             if (docSnap.data()[user.uid][i] == docSnap.data()[eachdoc.id][i]) {
 
+
               const actionsContainer = document.createElement("div");
               actionsContainer.className = "flex flex-col  items-center";
 
               const editButton = document.createElement("button");
+              editButton.setAttribute(`ref`, `${docID}`)
+              editButton.addEventListener(`click`, editComment)
               editButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-pen-to-square"></i>';
 
               const deleteButton = document.createElement("button");
+              deleteButton.setAttribute(`ref`, `${docID}`)
+              deleteButton.addEventListener(`click`, delComment)
               deleteButton.innerHTML = '<i class="fa-regular pl-2 pr-2 text-white fa-trash-can"></i>';
 
               actionsContainer.appendChild(editButton);
@@ -449,25 +456,115 @@ let displayComm = async (event) => {
 
 }
 
+//////////////////////Del Comment/////////////////////////////
+
+let delComment = async (event) => {
+
+  const docID = event.target.parentNode.getAttribute(`ref`);
+  console.log(docID)
+  const commentVal = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1].textContent
+  const delcommentLi = event.target.parentNode.parentNode.parentNode
+  console.log(commentVal)
+  const washingtonRef = doc(db, "threads", docID);
+  let user = auth.currentUser
+  console.log(user.uid)
+  // Atomically remove a region from the "regions" array field.
+  await updateDoc(washingtonRef, {
+    [user.uid]: arrayRemove(`${commentVal}`)
+  });
+  delcommentLi.remove()
+}
+
+/////////////////////Edit Comment ///////////////////////////////////
+let editComment = async (event) => {
+
+  const docID = event.target.parentNode.getAttribute(`ref`);
+  console.log(docID)
+  let prevCommentVal = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1].textContent
+  let prevCommentPara = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1]
+  let commentContainer = event.target.parentNode.parentNode.parentNode.childNodes[0]
+  console.log(commentContainer)
+  prevCommentPara.classList.add(`hidden`)
+  let inpComment = document.createElement(`input`)
+  inpComment.setAttribute(`class`, `border-2 text-white p-2 bg-blue-500 outline-none w-full`)
+  inpComment.value = prevCommentVal
+  inpComment.setAttribute(`ref`, docID)
+  inpComment.addEventListener(`keypress`, submitComment)
+  commentContainer.appendChild(inpComment)
+  
+  const washingtonRef = doc(db, "threads", docID);
+  let user = auth.currentUser
+  console.log(user.uid)
+  // Atomically remove a region from the "regions" array field.
+  await updateDoc(washingtonRef, {
+    [user.uid]: arrayRemove(`${prevCommentVal}`)
+  });
+  
+  // const docRef = doc(db, "threads", docID);
+  // const docSnap = await getDoc(docRef);
+  // let user = auth.currentUser
+  // if (docSnap.exists()) {
+  //   console.log("Document data:", docSnap.data());
 
 
-// let displayComm = async () => {
+
+  // } else {
+  //   // docSnap.data() will be undefined in this case
+  //   console.log("No such document!");
+  // }
+  // const commentVal = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1].textContent
+  // const delcommentLi = event.target.parentNode.parentNode.parentNode
+  // console.log(commentVal)
+  // const washingtonRef = doc(db, "threads", docID);
+  // let user = auth.currentUser
+  // console.log(user.uid)
+  // // Atomically remove a region from the "regions" array field.
+  // await updateDoc(washingtonRef, {
+  //   [user.uid]: arrayRemove(`${commentVal}`)
+  // });
+  // delcommentLi.remove()
+}
+
+let submitComment = async (event) => {
+
+  if (event.keyCode === 13) {
+
+    console.log("Enter key pressed!");
+    const docID = event.target.getAttribute(`ref`);
+    console.log(docID)
+    let user = auth.currentUser
+    let edittedComment = event.target.value
+    const washingtonRef = doc(db, "threads", docID);
+    // Atomically add a new region to the "regions" array field.
+    await updateDoc(washingtonRef, {
+      [user.uid]: arrayUnion(edittedComment)
+    });
+    let inpComment = event.target
+    inpComment.classList.add(`hidden`)
+    let para = event.target.previousSibling
+    //para.classList.add(``)
+    para.textContent = edittedComment
+    para.classList.remove(`hidden`)
+    console.log(para)
+    event.preventDefault();
+  }
+  // const docRef = doc(db, "threads", docID);
+  // const docSnap = await getDoc(docRef);
+  // let user = auth.currentUser
+  // if (docSnap.exists()) {
+  //   console.log("Document data:", docSnap.data());
 
 
-//   const docRef = doc(db, "cities", "SF");
-//   const docSnap = await getDoc(docRef);
 
-//   if (docSnap.exists()) {
-//     console.log("Document data:", docSnap.data());
-//   } else {
-//     // docSnap.data() will be undefined in this case
-//     console.log("No such document!");
-//   }
+  // } else {
+  //   // docSnap.data() will be undefined in this case
+  //   console.log("No such document!");
+  // }
 
 
 
-// }
 
+}
 
 
 ////////////////////////Sign-Out/////////////////////////////////////
