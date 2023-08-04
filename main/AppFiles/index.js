@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 import { getFirestore, collection, setDoc, addDoc, orderBy, serverTimestamp, query, onSnapshot, where, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-import { getStorage, ref ,uploadBytes} from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -57,7 +57,7 @@ but.addEventListener(`click`, () => {
       console.log(user.uid)
       console.log(file)
       // /usersProfileImage
-      
+
       const storageRef = ref(storage, 'users/' + user.uid + '/profile.jpg')
       // 'file' comes from the Blob or File API
       uploadBytes(storageRef, file).then((snapshot) => {
@@ -85,13 +85,14 @@ const CheckingUser = (user) => {
   if (user) {
 
     console.log('User is logged in:', user.email);
-
+    let body = document.getElementByTagName(`body`)
     let formContainer = document.getElementById(`formContainer`)
     let redirectContainer = document.getElementById(`redirectContainer`)
 
     if (!formContainer.classList.contains(`hidden`)) {
 
       formContainer.classList.add(`hidden`)
+      body.classList.remove(`blueImg`)
       redirectContainer.classList.remove(`hidden`)
 
     }

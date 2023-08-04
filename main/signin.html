@@ -9,8 +9,18 @@
     <link rel="stylesheet" href="./output.css">
 </head>
 
-<body class="h-screen bg-cover bg-bottom bg-no-repeat bg-SIn">
-    <div class=" flex flex-col justify-center  h-full">
+<body class="h-screen bg-cover bg-bottom bg-no-repeat bg-SIn ">
+    <div id="redirectContainer" class="flex flex-col hidden space-y-12 justify-center items-center h-screen">
+        <div class="text-2xl font-semibold text-center">
+            <h1 id="redirectHeading"></h1>
+        </div>
+        <div class="flex justify-center items-center">
+            <div class="flex p-1 flex-col items-center justify-center loader ease-linear  border-8 border-t-8 border-gray-200 h-24 w-24">
+              <h1 class="text-center font-bold  text-sm">Welcome to my Thread App</h1>
+            </div>
+          </div>
+    </div>
+    <div id="formContainer" class=" flex flex-col justify-center  h-full">
         <div class=" flex container justify-center h-3/4 mx-auto">
             <div class="flex flex-col order-2 w-11/12 relative  sm:w-2/4 ">
                 <div class="absolute  -inset-2 bg-[#040a1a] rounded-r-xl blur-sm"></div>
@@ -67,10 +77,10 @@
                     class="relative h-full flex flex-col justify-center items-center rounded-l-xl bg-gradient-to-br from-[#03132b] from-50% to-[#083763] to-50% ">
                     <div>
                         <h1 class="text-2xl text-white font-semibold text-center">Glad To See You!</h1>
-                        <h1 class="text-2xl text-white font-semibold text-center">Welcome To The Quiz App</h1>
-                        <p class=" text-white font-medium text-center">Sign Up to Our Quiz Application in order to
-                            attempt
-                            the Quiz <br> Enter Your Name Email Password</p>
+                        <h1 class="text-2xl text-white font-semibold text-center">Welcome To The Thread App</h1>
+                        <p class=" text-white font-medium text-center">Sign Up to Our Thread Application in order to
+                            Create
+                            Posts <br> Enter Your Name Email Password</p>
                     </div>
                 </div>
             </div>

@@ -99,7 +99,9 @@ threadCreateBut.addEventListener(`click`, async () => {
       }, 300);
     }
     else {
-      alert("Error : Fill all the Blanks")
+      //alert('sdfs')
+      openmessageModal()
+      dispmessageModel()
     }
   }
   catch (error) {
@@ -114,7 +116,7 @@ let displayThreads = () => {
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const threadList = document.getElementById("threadList");
     threadList.innerHTML = " "
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(async (doc) => {
       console.log(doc.data())
       // const docID = document.createElement(`span`)
       // docID.setAttribute(`class`, `hidden`)
@@ -160,7 +162,23 @@ let displayThreads = () => {
       // Create the span element for the reply count and add content
       const replyCountSpan = document.createElement("span");
       replyCountSpan.setAttribute("class", "text-sm text-gray-600");
-      replyCountSpan.textContent = "12 replies";
+
+      const q = query(collection(db, "userDetails"));
+      let totalreply = 0
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((user) => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(user.id, " => ", user.data());
+        if (doc.data()[user.id]) {
+          console.log(doc.data()[user.id])
+          let reply = doc.data()[user.id].length
+          totalreply = totalreply + reply
+          //console.log(reply)
+          replyCountSpan.textContent = `${totalreply} replies`;
+        }
+
+      });
+
 
       // Append the SVG icon and span to the first inner div inside the second inner div
       innerDiv.appendChild(svgIcon);
@@ -339,6 +357,8 @@ let addComment = async (e) => {
   } else {
     // docSnap.data() will be undefined in this case
     console.log("No such document!");
+    openCommentmessageModal()
+    dispmessageModel()
   }
   //console.log(docIDCont.textContent)
 
@@ -491,7 +511,7 @@ let editComment = async (event) => {
   inpComment.setAttribute(`ref`, docID)
   inpComment.addEventListener(`keypress`, submitComment)
   commentContainer.appendChild(inpComment)
-  
+
   const washingtonRef = doc(db, "threads", docID);
   let user = auth.currentUser
   console.log(user.uid)
@@ -499,30 +519,7 @@ let editComment = async (event) => {
   await updateDoc(washingtonRef, {
     [user.uid]: arrayRemove(`${prevCommentVal}`)
   });
-  
-  // const docRef = doc(db, "threads", docID);
-  // const docSnap = await getDoc(docRef);
-  // let user = auth.currentUser
-  // if (docSnap.exists()) {
-  //   console.log("Document data:", docSnap.data());
 
-
-
-  // } else {
-  //   // docSnap.data() will be undefined in this case
-  //   console.log("No such document!");
-  // }
-  // const commentVal = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1].textContent
-  // const delcommentLi = event.target.parentNode.parentNode.parentNode
-  // console.log(commentVal)
-  // const washingtonRef = doc(db, "threads", docID);
-  // let user = auth.currentUser
-  // console.log(user.uid)
-  // // Atomically remove a region from the "regions" array field.
-  // await updateDoc(washingtonRef, {
-  //   [user.uid]: arrayRemove(`${commentVal}`)
-  // });
-  // delcommentLi.remove()
 }
 
 let submitComment = async (event) => {
@@ -548,21 +545,73 @@ let submitComment = async (event) => {
     console.log(para)
     event.preventDefault();
   }
-  // const docRef = doc(db, "threads", docID);
-  // const docSnap = await getDoc(docRef);
-  // let user = auth.currentUser
-  // if (docSnap.exists()) {
-  //   console.log("Document data:", docSnap.data());
+
+}
 
 
+const messageDisplayModal = document.getElementById('myModal');
+const messagecloseModal = messageDisplayModal.getElementsByClassName('error-modal-close')[0];
+const messagemodalContainer = messageDisplayModal.getElementsByClassName('error-modal-container')[0];
+const messagemodalOverlay = messageDisplayModal.getElementsByClassName('error-modal-overlay')[0];
+///////////////////////////////Messgae Respond Modal///////////////////////////////////
 
-  // } else {
-  //   // docSnap.data() will be undefined in this case
-  //   console.log("No such document!");
-  // }
+let openmessageModal =  () => {
+    const modalText = document.getElementById(`Response`);
+    modalText.innerText = `Fill in the required blanks to create a Post`
+    //console.log(modalText.innerText)
+    //console.log(error.data)
+    messageDisplayModal.classList.remove('hidden');
+    setTimeout(() => {
+        messageDisplayModal.classList.add('modal-open');
+        messagemodalContainer.classList.add('modal-container-open');
+    }, 50);
 
+}
+let openCommentmessageModal =  () => {
+  const modalText = document.getElementById(`Response`);
+  modalText.innerText = `Fill in the required blank to add an Comment.`
+  //console.log(modalText.innerText)
+  //console.log(error.data)
+  messageDisplayModal.classList.remove('hidden');
+  setTimeout(() => {
+      messageDisplayModal.classList.add('modal-open');
+      messagemodalContainer.classList.add('modal-container-open');
+  }, 50);
 
-
+}
+let dispmessageModel = () => {
+    messagecloseModal.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagemodalOverlay.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagecloseModal.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
+    messagemodalOverlay.addEventListener('click', (event) => {
+        event.preventDefault()
+        messageDisplayModal.classList.remove('modal-open');
+        messagemodalContainer.classList.remove('modal-container-open');
+        setTimeout(() => {
+            messageDisplayModal.classList.add('hidden');
+        }, 300);
+    });
 
 }
 
@@ -570,15 +619,33 @@ let submitComment = async (event) => {
 ////////////////////////Sign-Out/////////////////////////////////////
 
 let userMenuButton = document.getElementById(`user-menu-button`)
-let userMenuDropDown = document.getElementById(`userMenuDropdown`)
-userMenuButton.addEventListener(`click`, (event) => {
-  event.preventDefault()
-  userMenuDropDown.classList.remove(`hidden`)
-})
+let userMenuDropdown = document.getElementById(`userMenuDropdown`)
 let signOutMenu = document.getElementById(`signOutMenu`)
+// Function to toggle the menu visibility
+function toggleMenu() {
+  //userMenuDropdown.classList.remove('hidden')
+  userMenuDropdown.classList.toggle('hidden');
+}
+// Event listener to open the menu when the button is clicked
+userMenuButton.addEventListener('click', toggleMenu);
+// Event listener to close the menu when focus is lost
+document.addEventListener('click', (event) => {
+  if (!userMenuDropdown.contains(event.target) && !userMenuButton.contains(event.target)) {
+    userMenuDropdown.classList.add('hidden');
+  }
+});
+
+// Event listener to handle clicks on menu links
+userMenuDropdown.addEventListener('click', (event) => {
+  if (event.target.tagName === 'A') {
+    // If a link is clicked, close the menu
+    userMenuDropdown.classList.add('hidden');
+  }
+});
+
 signOutMenu.addEventListener(`click`, () => {
   signOut(auth).then(() => {
-    alert('succesfully signed out')
+    // alert('succesfully signed out')
     location.href = './signin.html'
   }).catch((error) => {
     // An error happened.

@@ -21,28 +21,6 @@ const auth = getAuth(app);
 //const db = getFirestore(app)
 let but = document.querySelector(`#but`)
 but.addEventListener(`click`, async () => {
-    
-  //if(!localStorage.getItem(`userData`)){
-
-    //let userData = []
-    // const q = query(collection(db, "userDetails"));
-
-    // const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //   console.log(doc.id, " => ", doc.data());
-   
-    //   let obj = {
-    //         'Name' : doc.data().userName,
-    //         'emailID': doc.data().userEmail
-    //       }
-          
-    //      if(!localStorage.getItem('userData')){
-      //        userData.push(obj)
-      
-    // });
-    //localStorage.setItem(`userData`,JSON.stringify(userData))
-  //}
-  
   
   let email = document.querySelector(`#Semail`).value
     let password = document.querySelector(`#Spass`).value
@@ -64,9 +42,33 @@ const CheckingUser = (user) => {
     if (user) {
       
       console.log('User is logged in:', user.email);
-
-      location.href = `./profile.html`;
-
+      let body = document.getElementByTagName(`body`)
+              body.classList.remove(`bg-SIn`)
+      let formContainer = document.getElementById(`formContainer`)
+      let redirectContainer = document.getElementById(`redirectContainer`)
+  
+      if (!formContainer.classList.contains(`hidden`)) {
+  
+        formContainer.classList.add(`hidden`)
+        redirectContainer.classList.remove(`hidden`)
+  
+      }
+  
+      let sec = 3;
+      const redirectHeading = document.getElementById('redirectHeading');
+  
+      const myIntervalFunction = () => {
+        redirectHeading.textContent = `Redirecting You to Your Profile Page in ${sec} seconds`;
+        sec--;
+  
+        if (sec < 0) {
+          clearInterval(interval);
+          // Perform the redirect here, e.g.:
+          window.location.href = './profile.html';
+        }
+      };
+  
+      const interval = setInterval(myIntervalFunction, 1000); // 1000 milliseconds = 1 second
     } else {
     
       console.log('User is logged out');
@@ -74,19 +76,3 @@ const CheckingUser = (user) => {
   };
   
   onAuthStateChanged(auth, CheckingUser)
-
-// let obj = {
-//     'Name' : userName,
-//     'emailID': email
-//   }
-//   let userData = []
-  
-//   if(!localStorage.getItem('userData')){
-//       userData.push(obj)
-//       localStorage.setItem(`userData`,JSON.stringify(userData))
-//      }else{
-//       let userDataPar = localStorage.getItem(`userData`,userData)
-//       let parseduserData = JSON.parse(userDataPar)
-//       parseduserData.push(obj)
-//       localStorage.setItem(`userData`,JSON.stringify(parseduserData))
-//      }

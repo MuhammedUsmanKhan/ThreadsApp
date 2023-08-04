@@ -55,13 +55,75 @@ let viewPostDetails = async (event) => {
     let refDocID = event.target.getAttribute(`ref`)
     let Title = document.getElementById(`Title`)
     let threadContent = document.getElementById(`threadContent`)
+    let postImg = document.getElementById(`profimge`)
     const docRef = doc(db, "threads", refDocID);
     const docSnap = await getDoc(docRef);
+    const user = auth.currentUser
 
     if (docSnap.exists()) {
         console.log("Document data:", docSnap.data());
         Title.textContent = docSnap.data().threadTitle
         threadContent.textContent = docSnap.data().threadContent
+        getDownloadURL(ref(storage, 'users/' + user.uid + '/profile.jpg'))
+            .then((url) => {
+                // `url` is the download URL for 'images/stars.jpg
+                // Or inserted into an <img> element
+                //image.className = "h-11 w-12 sm:w-11 rounded-full";
+                postImg.setAttribute('src', url);
+                //image.alt = "User Image";
+            })
+            .catch((error) => {
+                // Handle any errors
+            });
+        let commentlistContainer = document.getElementById(`commentlistContainer`)
+        commentlistContainer.innerHTML = ""
+        const q = query(collection(db, "userDetails"));
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+
+            if (docSnap.data()[doc.id]) {
+                let comments = docSnap.data()[doc.id]
+
+                comments.forEach((comment) => {
+                    const li = document.createElement("li");
+                    li.className = "flex justify-between w-full";
+
+                    const commentContainer = document.createElement("div");
+                    commentContainer.className = "flex w-11/12  space-x-2";
+
+                    const image = document.createElement("img");
+
+                    getDownloadURL(ref(storage, 'users/' + doc.id + '/profile.jpg'))
+                        .then((url) => {
+                            // `url` is the download URL for 'images/stars.jpg
+                            // Or inserted into an <img> element
+                            image.className = "h-11 w-12 sm:w-11 rounded-full";
+                            image.setAttribute('src', url);
+                            image.alt = "User Image";
+                        })
+                        .catch((error) => {
+                            // Handle any errors
+                        });
+
+                    const content = document.createElement("p");
+                    content.className = "border-2 text-white p-2 ";
+                    content.textContent = comment;
+
+                    commentContainer.appendChild(image);
+                    commentContainer.appendChild(content);
+
+                    li.appendChild(commentContainer);
+                    commentlistContainer.appendChild(li)
+                })
+
+            }
+
+        });
+
+
     } else {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
@@ -225,35 +287,56 @@ let editBio = async () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
+        try {
+            console.log("Document data:", docSnap.data());
+            if (profHeader.value.trim().length != 0 && profBio.value.trim().length != 0) {
+                const washingtonRef = doc(db, "usersProfileDetails", docSnap.id);
+                // Set the "capital" field of the city 'DC'
+                await updateDoc(washingtonRef, {
+                    Header: profHeader.value,
+                    Biography: profBio.value
+                });
+                userprofHeader.textContent = profHeader.value
+                userBiography.textContent = profBio.value
+            } else {
+                console.log('hi')
+                openerrorModal()
+                dispmessageModel()
+            }
+        } catch (error) {
 
-        const washingtonRef = doc(db, "usersProfileDetails", docSnap.id);
-        // Set the "capital" field of the city 'DC'
-        await updateDoc(washingtonRef, {
-            Header: profHeader.value,
-            Biography: profBio.value
-        });
-        userprofHeader.textContent = profHeader.value
-        userBiography.textContent = profBio.value
+            console.log(error)
+
+        }
     } else {
         // docSnap.data() will be undefined in this case
         // addBiography
         // console.log("No such document!");
         //////////////////Adding User Bio Details in DB/////////////////////////////////
-        let profHeader = document.getElementById(`profHeader`)
-        let profBio = document.getElementById(`profBio`)
-        let userprofHeader = document.getElementById(`userprofHeader`)
-        let userBiography = document.getElementById(`userBiography`)
 
-        const user = auth.currentUser
-        await setDoc(doc(db, "usersProfileDetails", user.uid), {
-            Name: profileUser.textContent,
-            Biography: profBio.value,
-            Header: profHeader.value
-        });
+        try {
+            let profHeader = document.getElementById(`profHeader`)
+            let profBio = document.getElementById(`profBio`)
+            let userprofHeader = document.getElementById(`userprofHeader`)
+            let userBiography = document.getElementById(`userBiography`)
+            if (profHeader.value.trim().length != 0 && profBio.value.trim().length != 0) {
+                const user = auth.currentUser
+                await setDoc(doc(db, "usersProfileDetails", user.uid), {
+                    Name: profileUser.textContent,
+                    Biography: profBio.value,
+                    Header: profHeader.value
+                });
 
-        userBiography.textContent = profBio.value
-        userprofHeader.textContent = profHeader.value
+                userBiography.textContent = profBio.value
+                userprofHeader.textContent = profHeader.value
+            }
+
+        } catch (error) {
+
+            console.log(error)
+
+        }
+
 
     }
 
@@ -277,6 +360,18 @@ let openmessageModal = async (event) => {
         const modalText = document.getElementById(`Response`);
         modalText.innerText = `Post has been Succesfully Deleted`
     }
+    //console.log(modalText.innerText)
+    //console.log(error.data)
+    messageDisplayModal.classList.remove('hidden');
+    setTimeout(() => {
+        messageDisplayModal.classList.add('modal-open');
+        messagemodalContainer.classList.add('modal-container-open');
+    }, 50);
+
+}
+let openerrorModal =  () => {
+    const modalText = document.getElementById(`Response`);
+    modalText.innerText = `Fill in the required blanks to create a Post`
     //console.log(modalText.innerText)
     //console.log(error.data)
     messageDisplayModal.classList.remove('hidden');
