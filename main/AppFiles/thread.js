@@ -307,6 +307,7 @@ let addComment = async (e) => {
         [user.uid]: arrayUnion(comment)
       });
     }
+    
     const li = document.createElement("li");
     li.className = "flex justify-between w-full";
 
@@ -330,6 +331,7 @@ let addComment = async (e) => {
     const content = document.createElement("p");
     content.className = "border-2 text-white p-2 ";
     content.textContent = threadComment.value;
+    threadComment.value = ""
 
     commentContainer.appendChild(image);
     commentContainer.appendChild(content);
@@ -497,7 +499,9 @@ let delComment = async (event) => {
 
 /////////////////////Edit Comment ///////////////////////////////////
 let editComment = async (event) => {
-
+  console.log(event.target)
+  let editButton = event.target
+  editButton.parentNode.disabled = true
   const docID = event.target.parentNode.getAttribute(`ref`);
   console.log(docID)
   let prevCommentVal = event.target.parentNode.parentNode.parentNode.childNodes[0].childNodes[1].textContent
@@ -527,6 +531,9 @@ let submitComment = async (event) => {
   if (event.keyCode === 13) {
 
     console.log("Enter key pressed!");
+    //console.log(event.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[1].childNodes[1])
+    //let editBut = event.target.parentNode.parentNode.parentNode.childNodes[1].childNodes[1].childNodes[1]
+    editBut.disabled = false
     const docID = event.target.getAttribute(`ref`);
     console.log(docID)
     let user = auth.currentUser

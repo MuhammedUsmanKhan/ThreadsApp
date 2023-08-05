@@ -68,6 +68,9 @@ but.addEventListener(`click`, () => {
       let userID = user.uid
       console.log(userID)
       userAdd(userID, email, userName)
+      // let body = document.querySelector(`body`)
+      // body.classList.remove(`bg-blueImg`)
+
       //this.disabled = true
 
       //alert("hogaya")
@@ -85,14 +88,13 @@ const CheckingUser = (user) => {
   if (user) {
 
     console.log('User is logged in:', user.email);
-    let body = document.getElementByTagName(`body`)
+    //console.log(body)
     let formContainer = document.getElementById(`formContainer`)
     let redirectContainer = document.getElementById(`redirectContainer`)
 
     if (!formContainer.classList.contains(`hidden`)) {
 
       formContainer.classList.add(`hidden`)
-      body.classList.remove(`blueImg`)
       redirectContainer.classList.remove(`hidden`)
 
     }
